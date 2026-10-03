@@ -15,8 +15,6 @@ import { colors, fonts, radii, spacing, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Onboarding'>;
 
-const SLIDE_COUNT = 3;
-
 function usePager() {
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
@@ -52,26 +50,31 @@ export default function OnboardingScreen({ navigation }: Props) {
         onMomentumScrollEnd={onMomentumScrollEnd}
         style={{ width }}
       >
-        <LoginSlide width={width} onNext={() => goTo(1)} onSkip={goToMain} />
+        <LoginSlide
+          width={width}
+          active={active}
+          onNext={() => goTo(1)}
+          onSkip={goToMain}
+        />
         <LoginSlide2 width={width} onNext={() => goTo(2)} />
         <LoginSlide3 width={width} onLogin={goToMain} />
       </ScrollView>
-
-      <View style={styles.dots} pointerEvents="none">
-        {Array.from({ length: SLIDE_COUNT }).map((_, index) => (
-          <View
-            key={index}
-            style={[styles.dot, index === active && styles.dotActive]}
-          />
-        ))}
-      </View>
     </View>
   );
 }
 
 type SlideProps = { width: number };
 
-function LoginSlide({ width, onNext, onSkip }: SlideProps & { onNext: () => void; onSkip: () => void }) {
+function LoginSlide({
+  width,
+  active,
+  onNext,
+  onSkip,
+}: SlideProps & {
+  active: number;
+  onNext: () => void;
+  onSkip: () => void;
+}) {
   return (
     <View style={[styles.slide, { width }]} testID="onboarding-slide-1">
       <Image
@@ -79,12 +82,24 @@ function LoginSlide({ width, onNext, onSkip }: SlideProps & { onNext: () => void
         style={styles.heroImage}
         resizeMode="cover"
       />
+      <View style={styles.waveGreen} />
       <View style={styles.slide1Body}>
+        <View style={styles.slide1Dots}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.slide1Dot,
+                index === active && styles.slide1DotActive,
+              ]}
+            />
+          ))}
+        </View>
         <Text style={styles.slide1Title}>best tips for your motivation</Text>
         <Text style={styles.slide1Text}>
           Quisque sit amet sagittis erat. Duis pharetra ornare venenatis. Nulla
           maximus porta velit ut molestie. Proin quis convallis mauris. In
-          facilisis justo at mi pha…
+          facilisis justo at mi pharetra.
         </Text>
         <View style={styles.slide1Actions}>
           <Pressable
@@ -92,6 +107,10 @@ function LoginSlide({ width, onNext, onSkip }: SlideProps & { onNext: () => void
             accessibilityRole="link"
             accessibilityLabel="Skip step"
             onPress={onSkip}
+            style={({ pressed }) => [
+              styles.skipTarget,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={styles.skipText}>Skip step</Text>
           </Pressable>
@@ -100,7 +119,10 @@ function LoginSlide({ width, onNext, onSkip }: SlideProps & { onNext: () => void
             accessibilityRole="button"
             accessibilityLabel="Next"
             onPress={onNext}
-            style={({ pressed }) => [styles.nextButton, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.nextButton,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={styles.nextLabel}>Next</Text>
           </Pressable>
@@ -236,24 +258,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     overflow: 'hidden',
   },
-  dots: {
-    position: 'absolute',
-    bottom: spacing.s4,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.s1,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: radii.pill,
-    backgroundColor: colors.divider,
-  },
-  dotActive: {
-    backgroundColor: colors.accentLight,
-  },
   pressed: {
     opacity: 0.85,
   },
@@ -265,22 +269,47 @@ const styles = StyleSheet.create({
     width: 486,
     height: 729,
   },
-  slide1Body: {
+  waveGreen: {
     position: 'absolute',
-    bottom: 0,
+    top: 332,
     left: 0,
     right: 0,
-    paddingTop: spacing.s3,
-    paddingHorizontal: spacing.s3,
-    paddingBottom: spacing.s5,
+    height: 552,
+    backgroundColor: colors.accent,
+    opacity: 0.47,
+  },
+  slide1Body: {
+    position: 'absolute',
+    top: 344,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 273,
+    paddingHorizontal: 40,
+    paddingBottom: 29,
     backgroundColor: colors.bg,
+    borderTopLeftRadius: 120,
+    borderTopRightRadius: 120,
+  },
+  slide1Dots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 11,
+  },
+  slide1Dot: {
+    width: 10,
+    height: 10,
+    borderRadius: radii.pill,
+    backgroundColor: colors.divider,
+  },
+  slide1DotActive: {
+    backgroundColor: colors.accentLight,
   },
   slide1Title: {
-    fontFamily: fonts.display,
-    fontSize: 25,
-    lineHeight: 32,
+    ...typography.titleLg,
     color: colors.fg,
     textAlign: 'center',
+    marginTop: 40,
   },
   slide1Text: {
     fontFamily: fonts.body,
@@ -288,13 +317,18 @@ const styles = StyleSheet.create({
     lineHeight: 13,
     color: colors.muted,
     textAlign: 'center',
-    marginTop: spacing.s2,
+    marginTop: 31,
   },
   slide1Actions: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.s3,
+    marginTop: 52,
+  },
+  skipTarget: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   skipText: {
     fontFamily: fonts.body,
@@ -303,12 +337,12 @@ const styles = StyleSheet.create({
     color: colors.faint,
   },
   nextButton: {
+    width: 115,
+    height: 42,
     backgroundColor: colors.accent,
     borderRadius: radii.lg,
-    paddingHorizontal: spacing.s3,
-    paddingVertical: 12,
-    minWidth: 115,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   nextLabel: {
     fontFamily: fonts.body,
