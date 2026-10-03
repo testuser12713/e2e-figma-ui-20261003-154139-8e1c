@@ -33,10 +33,12 @@ export default function DashboardScreen({ navigation }: Props) {
         >
           <Ionicons name="menu" size={18} color={colors.onAccent} />
         </Pressable>
-        <Image
-          source={require('../../design/figma/assets/noun-user-1335326.png')}
-          style={styles.headerUserIcon}
-        />
+        <View style={styles.headerUserTouch}>
+          <Image
+            source={require('../../design/figma/assets/noun-user-1335326.png')}
+            style={styles.headerUserIcon}
+          />
+        </View>
         <Text style={styles.headerTitle}>Dashboard</Text>
       </View>
 
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    width: 414,
+    width: '100%',
     height: 126,
     backgroundColor: colors.accent,
     ...shadow,
@@ -108,12 +110,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerUserIcon: {
+  headerUserTouch: {
     position: 'absolute',
     top: 25,
-    left: 367,
+    right: 40,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerUserIcon: {
     width: 27,
     height: 27,
+    tintColor: colors.fg,
   },
   headerTitle: {
     position: 'absolute',
